@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  .container
+    form(id="file-submit-form")
+      .form-group
+        label(for="file") File Selected:
+        input(type="file" class="form-control" id="file" name="file")
+
+      button(type="submit" class="btn btn-primary" id="file-submit") Submit
