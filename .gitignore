@@ -4,5 +4,7 @@
 node_modules
 
 uploads
+torrents
+zips
 
 .env
