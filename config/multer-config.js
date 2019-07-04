@@ -24,7 +24,8 @@ var storage = multer.diskStorage({
     var fileName = slug(fileOriginalName.toLowerCase().split('').slice(0, MAXIMUM_FILE_NAME_LENGTH).join(''));
     var fileExtension = fileParts[fileParts.length - 1];
 
-    cb(null, fieldName + '-' + fileName + '-' + Date.now() + '.' + fileExtension);
+    // cb(null, fieldName + '-' + fileName + '-' + Date.now() + '.' + fileExtension);
+    cb(null, 'zip-' + Date.now() + '.' + fileExtension);
   }
 });
 
