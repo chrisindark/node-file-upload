@@ -8,6 +8,7 @@ var fileUploadFn = function (sequelize, DataTypes) {
   }, {});
   FileUpload.associate = function(models) {
     // associations can be defined here
+    models.FileUpload.hasMany(models.ZipUpload);
   };
   return FileUpload;
 };

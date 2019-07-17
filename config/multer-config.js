@@ -1,5 +1,6 @@
 var multer  = require('multer');
 var slug = require('slug');
+var saveFileUtility = require('../utils/save-files-utility');
 
 
 var ALLOWED_FILE_TYPES = ['image', 'audio', 'video'];
@@ -17,15 +18,8 @@ var storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     // console.log('here2', file);
-    var fileParts = file.originalname.split('.');
-    var fileOriginalName = fileParts.slice(0, fileParts.length - 1).join('.');
-
-    var fieldName = file.fieldname.replace(/\W+/g, '-').toLowerCase();
-    var fileName = slug(fileOriginalName.toLowerCase().split('').slice(0, MAXIMUM_FILE_NAME_LENGTH).join(''));
-    var fileExtension = fileParts[fileParts.length - 1];
-
-    // cb(null, fieldName + '-' + fileName + '-' + Date.now() + '.' + fileExtension);
-    cb(null, 'zip-' + Date.now() + '.' + fileExtension);
+    saveFileUtility.renameFile(req, file, cb);
+    // cb(null, 'zip-' + Date.now() + '.' + fileExtension);
   }
 });
 
@@ -56,11 +50,14 @@ function fileFilter(req, file, cb) {
   // cb(new Error('I don\'t have a clue!'))
 }
 
-module.exports.options = {
-  storage: storage,
-  limits: {
-    files: 1,
-    fileSize: 20000000 // 200mb, in bytes
+module.exports = {
+  options: {
+    storage: storage,
+    limits: {
+      files: 1,
+      fileSize: 20000000 // 200mb, in bytes
+    },
+    fileFilter: fileFilter
   },
-  fileFilter: fileFilter
+  MAXIMUM_FILE_NAME_LENGTH: 100
 };

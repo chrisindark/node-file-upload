@@ -5,8 +5,10 @@ var multer = require('multer');
 var multerConfig = require('../config/multer-config');
 var yazl = require('yazl');
 var FileUpload = require('../models').FileUpload;
+var saveFileUtility = require('../utils/save-files-utility');
 
 var WebTorrent = require('webtorrent');
+var NodeTorrent = require('node-torrent');
 
 var multerUpload = multer(multerConfig.options).single('file');
 
@@ -29,7 +31,7 @@ router.post('/', function(req, res) {
     // Everything went fine
     if (req.file) {
       console.log(req.file);
-      var zipFile = new yazl.ZipFile();
+      // var zipFile = new yazl.ZipFile();
 
       // zipFile.addFile(req.file.path, req.file.filename);
       // zipFile.outputStream
@@ -40,14 +42,17 @@ router.post('/', function(req, res) {
       // zipFile.end();
 
       var client = new WebTorrent();
+      // var client = new NodeTorrent({logLevel: 'DEBUG'});
+
       var magnetLink = 'magnet:?xt=urn:btih:0a553dcb9d27a963b5021e9cabbe079de88e2ec8&dn=Halsey-Without+Me.mp3&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Fexodus.desync.com%3A6969';
 
-      // client.add(magnetLink, { path: './torrents' }, function (torrent) {
+      client.add(magnetLink, { path: './torrents' }, function (torrent) {
+        console.log('client has torrent added', torrent.torrentFile, torrent.magnetURI);
+      });
+
+      // client.add(req.file.path, { path: './torrents' }, function (torrent) {
       //   console.log('client has torrent added');
       // });
-      client.add(req.file.path, { path: './torrents' }, function (torrent) {
-        console.log('client has torrent added');
-      });
 
       client.on('torrent', function (torrent) {
         console.log('client has torrent ready');
@@ -77,13 +82,27 @@ router.post('/', function(req, res) {
 
         torrent.on('done', function () {
           console.log('torrent download finished');
-          torrent.files.forEach(function (file) {
 
+          var torrentFileName = saveFileUtility.renameFile(null, torrent, null, 'torrent');
+          fs.open('./uploads/' + torrentFileName, 'w', function (err, fd) {
+            fs.write(fd, torrent.torrentFile, 0, torrent.torrentFile.length, null, function(err) {
+              if (err) {}
+
+              fs.close(fd, function() {
+                console.log('Torrent file saved successfully!');
+              });
+            });
+          });
+
+
+          torrent.files.forEach(function (file) {
+            var zipFile = new yazl.ZipFile();
+            var zipFileName = saveFileUtility.renameFile(null, torrent, null, 'zip');
             zipFile.addFile('./torrents/' + file.path, file.name);
             zipFile.outputStream
-              .pipe(fs.createWriteStream('./zips/' + file.name + '.zip'))
+              .pipe(fs.createWriteStream('./zips/' + zipFileName))
               .on('close', function () {
-                console.log('zipping done');
+                console.log('Zipping done successfully!');
               });
             zipFile.end();
           });
