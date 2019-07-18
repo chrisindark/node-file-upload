@@ -8,7 +8,6 @@ var FileUpload = require('../models').FileUpload;
 var saveFileUtility = require('../utils/save-files-utility');
 
 var WebTorrent = require('webtorrent');
-var NodeTorrent = require('node-torrent');
 
 var multerUpload = multer(multerConfig.options).single('file');
 

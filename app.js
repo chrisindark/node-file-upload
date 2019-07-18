@@ -37,9 +37,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/', index);
-app.use('/users', users);
-// app.use('/photos', photos);
-// app.use('/albums', albums);
+app.use('/api/users', users);
+// app.use('/api/photos', photos);
+// app.use('/api/albums', albums);
 app.use('/api/files', files);
 
 // catch 404 and forward to error handler
