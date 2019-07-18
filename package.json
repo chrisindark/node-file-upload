@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "devstart": "nodemon ./bin/www"
+    "devstart": "npx nodemon ./bin/www",
+    "prodstart": "npx pm2 ./bin/www"
   },
   "devDependencies": {
     "nodemon": "1.18.10",
