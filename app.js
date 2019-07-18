@@ -33,8 +33,10 @@ models.sequelize.sync().then(function () {
   console.log(err, 'somwthing went wrong with the database update!');
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/torrents', express.static(path.join(__dirname, 'uploads')));
+app.use('/zips', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/', index);
 app.use('/api/users', users);
