@@ -8,6 +8,7 @@ var ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/gif', 'image/png',
   'image/bmp', 'image/webp'];
 var ALLOWED_AUDIO_TYPES = ['audio/mp3', 'audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/ogg'];
 var ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
+var ALLOWED_APPLICATION_TYPES = ['application/x-bittorrent'];
 
 var MAXIMUM_FILE_NAME_LENGTH = 100;
 
@@ -37,6 +38,8 @@ function fileFilter(req, file, cb) {
   } else if (fileType === 'audio' && ALLOWED_AUDIO_TYPES.indexOf(file.mimetype) === -1) {
     cb(null, false);
   } else if (fileType === 'video' && ALLOWED_VIDEO_TYPES.indexOf(file.mimetype) === -1) {
+    cb(null, false);
+  } else if (fileType === 'application' && ALLOWED_APPLICATION_TYPES.indexOf(file.mimetype) === -1) {
     cb(null, false);
   }
 

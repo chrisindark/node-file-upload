@@ -29,7 +29,7 @@
     "sequelize-restful": "0.4.3",
     "serve-favicon": "2.5.0",
     "slug": "1.0.0",
-    "webtorrent": "0.101.0",
+    "webtorrent": "0.95.6",
     "yazl": "2.5.1"
   }
 }

@@ -31,109 +31,97 @@ router.post('/', function(req, res) {
     // Everything went fine
     if (req.file) {
       console.log(req.file);
-      // var zipFile = new yazl.ZipFile();
 
-      // zipFile.addFile(req.file.path, req.file.filename);
-      // zipFile.outputStream
-      //   .pipe(fs.createWriteStream('./uploads/' + req.file.filename + '.zips'))
-      //   .on('close', function () {
-      //     console.log('zipping done');
-      //   });
-      // zipFile.end();
-
-      var client = new WebTorrent();
-      // var client = new NodeTorrent({logLevel: 'DEBUG'});
-
-      var magnetLink = 'magnet:?xt=urn:btih:0a553dcb9d27a963b5021e9cabbe079de88e2ec8&dn=Halsey-Without+Me.mp3&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Fexodus.desync.com%3A6969';
-
-      client.add(magnetLink, { path: './torrents' }, function (torrent) {
-        console.log('client has torrent added', torrent.torrentFile, torrent.magnetURI);
-      });
-
-      // client.add(req.file.path, { path: './torrents' }, function (torrent) {
-      //   console.log('client has torrent added');
-      // });
-
-      client.on('torrent', function (torrent) {
-        console.log('client has torrent ready');
-
-        torrent.on('error', function (err) {
-          console.log('torrent error occurred');
+      var fileType = req.file.mimetype.split('/')[0];
+      FileUpload.create({
+        file_name: req.file.filename,
+        file_type: fileType,
+        file_content_type: req.file.mimetype,
+        file_size: req.file.size,
+        file_path: req.file.path
+      }).then(function (fileObj) {
+        // console.log('here4', fileObj.dataValues);
+        res.status(200).json({
+          file: fileObj.dataValues,
+          status: 'success',
+          msg: 'File uploaded successfully!'
         });
 
-        torrent.on('infoHash', function () {
-          console.log('torrent infoHash received');
+        var client = new WebTorrent();
+
+        var magnetLink = 'magnet:?xt=urn:btih:0a553dcb9d27a963b5021e9cabbe079de88e2ec8&dn=Halsey-Without+Me.mp3&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Fexodus.desync.com%3A6969';
+
+        // client.add(magnetLink, { path: './torrents' }, function (torrent) {
+        //   console.log('client has torrent added', torrent.torrentFile, torrent.magnetURI);
+        // });
+
+        client.add(req.file.path, { path: './torrents' }, function (torrent) {
+          console.log('client has torrent added');
         });
 
-        torrent.on('metadata', function () {
-          console.log('torrent metadata received');
-        });
+        client.on('torrent', function (torrent) {
+          console.log('client has torrent ready');
 
-        torrent.on('ready', function () {
-          console.log('torrent ready');
-        });
+          torrent.on('error', function (err) {
+            console.log('torrent error occurred');
+          });
 
-        torrent.on('download', function (bytes) {
-          // console.log('just downloaded: ' + bytes);
-          // console.log('total downloaded: ' + torrent.downloaded);
-          // console.log('download speed: ' + torrent.downloadSpeed);
-          // console.log('progress: ' + torrent.progress);
-        });
+          torrent.on('infoHash', function () {
+            console.log('torrent infoHash received');
+          });
 
-        torrent.on('done', function () {
-          console.log('torrent download finished');
+          torrent.on('metadata', function () {
+            console.log('torrent metadata received');
+          });
 
-          var torrentFileName = saveFileUtility.renameFile(null, torrent, null, 'torrent');
-          fs.open('./uploads/' + torrentFileName, 'w', function (err, fd) {
-            fs.write(fd, torrent.torrentFile, 0, torrent.torrentFile.length, null, function(err) {
-              if (err) {}
+          torrent.on('ready', function () {
+            console.log('torrent ready');
+          });
 
-              fs.close(fd, function() {
-                console.log('Torrent file saved successfully!');
-              });
+          torrent.on('download', function (bytes) {
+            // console.log('just downloaded: ' + bytes);
+            // console.log('total downloaded: ' + torrent.downloaded);
+            // console.log('download speed: ' + torrent.downloadSpeed);
+            // console.log('progress: ' + torrent.progress);
+          });
+
+          torrent.on('done', function () {
+            console.log('torrent download finished');
+
+            // var torrentFileName = saveFileUtility.renameFile(null, torrent, null, 'torrent');
+            // fs.open('./uploads/' + torrentFileName, 'w', function (err, fd) {
+            //   fs.write(fd, torrent.torrentFile, 0, torrent.torrentFile.length, null, function(err) {
+            //     if (err) {}
+            //
+            //     fs.close(fd, function() {
+            //       console.log('Torrent file saved successfully!');
+            //     });
+            //   });
+            // });
+
+            torrent.files.forEach(function (file) {
+              var zipFile = new yazl.ZipFile();
+              var zipFileName = saveFileUtility.renameFile(null, torrent, null, 'zip');
+              zipFile.addFile('./torrents/' + file.path, file.name);
+              zipFile.outputStream
+                .pipe(fs.createWriteStream('./zips/' + zipFileName))
+                .on('close', function () {
+                  console.log('Zipping done successfully!');
+
+
+                });
+              zipFile.end();
             });
+
+            client.destroy();
           });
+        });
 
-
-          torrent.files.forEach(function (file) {
-            var zipFile = new yazl.ZipFile();
-            var zipFileName = saveFileUtility.renameFile(null, torrent, null, 'zip');
-            zipFile.addFile('./torrents/' + file.path, file.name);
-            zipFile.outputStream
-              .pipe(fs.createWriteStream('./zips/' + zipFileName))
-              .on('close', function () {
-                console.log('Zipping done successfully!');
-              });
-            zipFile.end();
-          });
-
-          client.destroy();
+        client.on('error', function (err) {
+          console.log('client error occurred');
         });
       });
 
-      client.on('error', function (err) {
-        console.log('client error occurred');
-      });
-
-      res.json({
-        status: 'success'
-      });
-
-      // var fileType = req.file.mimetype.split('/')[0];
-      // FileUpload.create({
-      //   file_name: req.file.filename,
-      //   file_type: fileType,
-      //   file_content_type: req.file.mimetype,
-      //   file_size: req.file.size,
-      //   file_path: req.file.path
-      // }).then(function (fileObj) {
-      //   // console.log('here4', fileObj.dataValues);
-      //   return res.status(200).json({
-      //     file: fileObj.dataValues,
-      //     status: 'success',
-      //     msg: "File uploaded successfully!"
-      //   });
-      // });
     } else {
       return res.status(400).json({
         status: 'error',
