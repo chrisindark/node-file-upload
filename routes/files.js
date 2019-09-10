@@ -48,7 +48,7 @@ router.post('/', function(req, res) {
 
         var client = new WebTorrent();
 
-        var magnetLink = 'magnet:?xt=urn:btih:0a553dcb9d27a963b5021e9cabbe079de88e2ec8&dn=Halsey-Without+Me.mp3&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Fexodus.desync.com%3A6969';
+        // var magnetLink = 'magnet:?xt=urn:btih:0a553dcb9d27a963b5021e9cabbe079de88e2ec8&dn=Halsey-Without+Me.mp3&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Fexodus.desync.com%3A6969';
 
         // client.add(magnetLink, { path: './torrents' }, function (torrent) {
         //   console.log('client has torrent added', torrent.torrentFile, torrent.magnetURI);

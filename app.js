@@ -11,6 +11,11 @@ var users = require('./routes/users');
 var photos = require('./routes/photos');
 var albums = require('./routes/albums');
 var files = require('./routes/files');
+var saveFilesUtility = require('./utils/save-files-utility');
+
+saveFilesUtility.createFolder('./uploads');
+saveFilesUtility.createFolder('./torrents');
+saveFilesUtility.createFolder('./zips');
 
 var app = express();
 

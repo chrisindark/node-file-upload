@@ -1,3 +1,4 @@
+var fs = require('fs');
 var slug = require('slug');
 var yazl = require('yazl');
 var multerConfig = require('../config/multer-config');
@@ -37,7 +38,13 @@ var saveFileToTorrents = function () {};
 
 var saveFileToZips = function () {};
 
+var createFolder = function (dir) {
+  if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+  }
+};
 
 module.exports = {
-  renameFile: renameFile
+  renameFile: renameFile,
+  createFolder: createFolder
 };
