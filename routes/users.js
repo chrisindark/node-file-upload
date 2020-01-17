@@ -1,11 +1,17 @@
 var express = require('express');
+var cookie = require('cookie');
+
 var router = express.Router();
-var User = require('../models').User;
+var models = require('../models');
 
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  User.findAll({
+  var cookies = cookie.parse(req.headers.cookie || '');
+  var test = cookies.test;
+  console.log('cookies', test);
+
+  models.User.findAll({
     include: [ models.Task ]
   }).then(function (users) {
     return res.status(200).json({users: users});
